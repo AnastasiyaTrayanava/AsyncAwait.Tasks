@@ -8,6 +8,7 @@
 */
 
 using System;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace AsyncAwait.Task1.CancellationTokens;
 
 internal class Program
 {
+    private static CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     /// <summary>
     /// The Main method should not be changed at all.
     /// </summary>
@@ -50,20 +52,14 @@ internal class Program
 
     private static async void CalculateSum(int n)
     {
-        var cancellationTokenSource = new CancellationTokenSource();
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource = new CancellationTokenSource();
 
         Console.WriteLine($"The task for {n} started... Enter N to cancel the request:");
-        var sum = await Calculator.Calculate(n, cancellationTokenSource.Token);
+        var sum = await Calculator.Calculate(n, _cancellationTokenSource.Token);
 
         Console.WriteLine($"Sum for {n} = {sum}.");
         Console.WriteLine();
         Console.WriteLine("Enter N: ");
-
-        cancellationTokenSource.Cancel();
-
-        if (cancellationTokenSource.IsCancellationRequested)
-        {
-            Console.WriteLine($"Sum for {n} cancelled...");
-        }
     }
 }
